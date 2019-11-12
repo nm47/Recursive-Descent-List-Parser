@@ -9,7 +9,10 @@ struct Parse_state {
 	std::vector<Token> tokens;
 };
 
-int Accept(int type, Parse_state &state, bool peek = false){
+Parse_state state;
+void Expression();
+
+int Accept(int type, bool peek = false){
 	while(state.tokens[state.current_token].Gettype()==SPACE){
 		state.line+=' ';
 		state.current_token++;
@@ -24,46 +27,71 @@ int Accept(int type, Parse_state &state, bool peek = false){
 	return 0;
 }
 
-void Factor(Parse_state &state){
-	if(Accept(NUMBER, state)){return;}
-	//if(Accept(STRING, state)){std::cout<<"STRING"<<std::endl;return;}
-	if(Accept(NONE, state)){return;}
+void Expect(int type){
+	if(!Accept(type))
+		std::cout<<"Parsing Error"<<std::endl;
 }
 
-void Expression(Parse_state &state){
-	if(Accept(OBRACKET, state)){
-		Expression(state);
-		if(Accept(CBRACKET,state)){return;}
+void List(){
+	Expression();
+	Expect(CBRACKET);
+}
+
+void Factor(){
+	if(Accept(NUMBER))
+		return;
+	if(Accept(IDENT))return;
+	if(Accept(OBRACKET))
+		List();
+}
+
+void Term(){
+	Factor();
+	while(Accept(MULT)||Accept(DIV))
+		Factor();
+}
+
+void Expression(){
+	Term();
+	while(Accept(PLUS)||Accept(MINUS)){
+		Term();
 	}
-	Factor(state);
-	while(Accept(MULT,state)||Accept(DIV,state))
-		Factor(state);
 }
 
-void Assignment (Parse_state &state){
-	Expression(state);
+void Assignment (){
+	Expression();
 }
 
-void Ident(Parse_state &state){
-	if(Accept(EQUALS, state))Assignment(state);
+void Ident(){
+	if(Accept(EQUALS))
+		Assignment();
 }
 
-void Statement(Parse_state &state){
-	if(Accept(IDENT, state))
-		Ident(state);
-	Accept(ENDLINE, state);
+void Print(){
+	Accept(LPAREN);
+	Expression();
+	Accept(RPAREN);
+}
+
+void Statement(){
+	if(Accept(IDENT))
+		Ident();
+	if(Accept(PRINT))
+		Print();
+
+	Expect(ENDLINE);
 	return;
 }
 
 void Parse(std::vector<Token>&tokens){
-	Parse_state state;
 	state.tokens = tokens;
 
 	//for (auto i:tokens)
 		//std::cout<<i.Getvalue()<<" " << Symbols[i.Gettype()]<<std::endl;
 	while (state.current_token < state.tokens.size()){
 		state.line = "";
-		Statement(state);
+		Statement();
+		if(state.line == "")return;
 		std::cout<<state.line<<std::endl;
 	}
 }
