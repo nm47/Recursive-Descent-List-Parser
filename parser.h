@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-typedef enum {NONE, SPACE, IDENT, NUMBER, ENDLINE, EQUALS, PLUS, MULT,DIV, OBRACKET, CBRACKET}Symbol;
+typedef enum {NONE, SPACE, IDENT, NUMBER, STRING, ENDLINE, EQUALS, PLUS, MINUS, MULT,DIV, OBRACKET, CBRACKET, RPAREN, LPAREN, PRINT}Symbol;
 
 class Token {
 	private:
@@ -25,12 +25,17 @@ static char const * Symbols[] =
 	"SPACE",
 	"IDENT",
 	"NUMBER",
+	"STRING",
 	"ENDLINE",
 	"EQUALS",
 	"PLUS",
+	"MINUS",
 	"MULT",
 	"DIV",
 	"OBRACKET",
-	"CBRACKET"
+	"CBRACKET",
+	"RPAREN",
+	"LPAREN",
+	"PRINT"
 };
 #endif

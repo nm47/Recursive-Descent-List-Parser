@@ -41,6 +41,7 @@ void Factor(){
 	if(Accept(NUMBER))
 		return;
 	if(Accept(IDENT))return;
+	if(Accept(STRING))return;
 	if(Accept(OBRACKET))
 		List();
 }
@@ -52,10 +53,12 @@ void Term(){
 }
 
 void Expression(){
+	Accept(LPAREN);
 	Term();
 	while(Accept(PLUS)||Accept(MINUS)){
 		Term();
 	}
+	Accept(RPAREN);
 }
 
 void Assignment (){
