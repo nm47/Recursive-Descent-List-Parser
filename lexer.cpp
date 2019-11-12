@@ -11,9 +11,11 @@ Token match(std::string exp){
 	
 	std::regex number("^[0-9]+");
 	std::regex ident("^[a-zA-Z_][a-zA-Z0-9_]*");
+	std::regex print("^[a-zA-Z_][a-zA-Z0-9_]*");
 
 	if(regex_search(exp,m, number)){candidates.push_back(Token(NUMBER, m[0]));}
 	if(regex_search(exp,m, ident)){candidates.push_back(Token(IDENT, m[0]));}
+	if(regex_search(exp,m, print)){candidates.push_back(Token(PRINT, m[0]));}
 
 	Token record;
 	if(candidates.size() > 0){
