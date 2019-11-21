@@ -18,6 +18,7 @@ class Var {
 		Var(int t, std::string v){type=t; value=v;}
 		void Settype(int t){type = t;}
 		void Setvalue(std::string v){value = v;}
+		std::string Getvalue(){return value;}
 };
 
 Parse_state state;
@@ -41,8 +42,10 @@ int Accept(int type, bool peek = false){
 }
 
 void Expect(int type){
-	if(!Accept(type))
+	if(!Accept(type)){
 		std::cout<<"Parsing Error"<<std::endl;
+		std::cout<<"Expected " <<Symbols[type]<<" Got: "<<Symbols[state.tokens[state.current_token].Gettype()]<<std::endl;
+	}
 }
 
 void List(){
@@ -51,12 +54,18 @@ void List(){
 }
 
 void Factor(){
+	Var t = variables.back();
 	if(Accept(NUMBER))
 		return;
 	if(Accept(IDENT))return;
-	if(Accept(STRING)){
+	if(Accept(STRING,true)){
 		variables.back().Settype(STRING);
-		//variables.back().Setvalue(); we dont have the value because Accept swallows the token unless we call Accept( , true) FIX
+		std::string value = state.tokens[state.current_token].Getvalue();
+		t.Setvalue(value);
+		variables.back() = t;
+		//std::cout<<"New Variable with value "<<state.tokens[state.current_token].Getvalue()<<std::endl;
+		//this is definitely bad code, could be better but left for the sake of time.
+		Accept(STRING);
 		return;
 	}
 	if(Accept(OBRACKET))
@@ -104,6 +113,7 @@ void Statement(){
 	if(Accept(PRINT))
 		Print();
 
+
 	Expect(ENDLINE);
 	return;
 }
@@ -111,8 +121,9 @@ void Statement(){
 void Parse(std::vector<Token>&tokens){
 	state.tokens = tokens;
 
-	//for (auto i:tokens)
-		//std::cout<<i.Getvalue()<<" " << Symbols[i.Gettype()]<<std::endl;
+	for (auto i:tokens)
+		std::cout<<i.Getvalue()<<" " << Symbols[i.Gettype()]<<std::endl;
+	std::cout <<"\n--------------------------------------------"<<std::endl;
 	while (state.current_token < state.tokens.size()){
 		state.line = "";
 		Statement();
