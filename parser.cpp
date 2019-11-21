@@ -10,11 +10,14 @@ struct Parse_state {
 };
 
 class Var {
-	public:
+	private:
 		int type = NONE;
 		std::string value = "";
 
-		Var(int s, std::string v){type=s; value=v;}
+	public:
+		Var(int t, std::string v){type=t; value=v;}
+		void Settype(int t){type = t;}
+		void Setvalue(std::string v){value = v;}
 };
 
 Parse_state state;
@@ -51,7 +54,11 @@ void Factor(){
 	if(Accept(NUMBER))
 		return;
 	if(Accept(IDENT))return;
-	if(Accept(STRING))return;
+	if(Accept(STRING)){
+		variables.back().Settype(STRING);
+		//variables.back().Setvalue(); we dont have the value because Accept swallows the token unless we call Accept( , true) FIX
+		return;
+	}
 	if(Accept(OBRACKET))
 		List();
 }
@@ -71,14 +78,14 @@ void Expression(){
 	Accept(RPAREN);
 }
 
-void Assignment (){
+void Assignment(){
 	Expression();
 }
 
 void Ident(){
 	Token t = state.tokens[state.current_token];
 	Var v = Var(t.Gettype(), t.Getvalue()); 
-	variables.push_back(v);
+	variables.push_back(v);			//push the IDENT into variables, we'll assign the type when we know what it is.
 	
 	Accept(IDENT);
 	if(Accept(EQUALS))
