@@ -10,12 +10,14 @@ Token match(std::string exp){
 	std::smatch m;
 	
 	std::regex number("^[0-9]+");
+	std::regex print("^print");
 	std::regex ident("^[a-zA-Z_][a-zA-Z0-9_]*");
-	std::regex print("^[a-zA-Z_][a-zA-Z0-9_]*");
+	std::regex string("^(\'(.{2,})')|^(\"([^\\\"]|\\.)*\")");
 
 	if(regex_search(exp,m, number)){candidates.push_back(Token(NUMBER, m[0]));}
-	if(regex_search(exp,m, ident)){candidates.push_back(Token(IDENT, m[0]));}
 	if(regex_search(exp,m, print)){candidates.push_back(Token(PRINT, m[0]));}
+	if(regex_search(exp,m, ident)){candidates.push_back(Token(IDENT, m[0]));}
+	if(regex_search(exp,m, string)){candidates.push_back(Token(STRING, m[0]));}
 
 	Token record;
 	if(candidates.size() > 0){
@@ -26,11 +28,17 @@ Token match(std::string exp){
 	}
 
 	if(exp.at(0)=='+'){return Token(PLUS,"+");}
+	if(exp.at(0)=='*'){return Token(MULT,"*");}
+	if(exp.at(0)=='/'){return Token(DIV,"/");}
+	if(exp.at(0)=='-'){return Token(MINUS,"-");}
+	if(exp.at(0)=='('){return Token(LPAREN,"(");}
+	if(exp.at(0)==')'){return Token(RPAREN,")");}
 	if(exp.at(0)=='['){return Token(OBRACKET,"[");}
 	if(exp.at(0)==']'){return Token(CBRACKET,"]");}
 	if(exp.at(0)=='='){return Token(EQUALS,"=");}
 	if(exp.at(0)==' '){return Token(SPACE," ");}
 
+	std::cout<<exp.at(0)<<std::endl;
 	return Token();
 }
 
@@ -43,7 +51,7 @@ void lex (std::string line, std::vector<Token>&tokens){
 		m = match(remaining);
 		remaining.erase(0, m.Getvalue().size());
 		if(m.Gettype()==NONE){
-			std::cout<<"nothing matched.."<<m.Getvalue()<<std::endl;
+			std::cout<<"nothing matched.."<<"|"<< m.Getvalue()<<"|"<<std::endl;
 			break;
 		}
 		tokens.push_back(m);

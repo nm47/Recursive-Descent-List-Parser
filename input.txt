@@ -1,3 +1,4 @@
-a=[3]+[4]
-print(a)
-b=3+1
+a="Hello"
+b="World"
+l1=a+b
+print(l1)

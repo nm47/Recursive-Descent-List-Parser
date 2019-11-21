@@ -9,7 +9,17 @@ struct Parse_state {
 	std::vector<Token> tokens;
 };
 
+class Var {
+	public:
+		int type = NONE;
+		std::string value = "";
+
+		Var(int s, std::string v){type=s; value=v;}
+};
+
 Parse_state state;
+std::vector<Var>variables;
+
 void Expression();
 
 int Accept(int type, bool peek = false){
@@ -66,6 +76,11 @@ void Assignment (){
 }
 
 void Ident(){
+	Token t = state.tokens[state.current_token];
+	Var v = Var(t.Gettype(), t.Getvalue()); 
+	variables.push_back(v);
+	
+	Accept(IDENT);
 	if(Accept(EQUALS))
 		Assignment();
 }
@@ -77,7 +92,7 @@ void Print(){
 }
 
 void Statement(){
-	if(Accept(IDENT))
+	if(Accept(IDENT,true))
 		Ident();
 	if(Accept(PRINT))
 		Print();
