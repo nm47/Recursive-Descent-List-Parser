@@ -12,13 +12,17 @@ struct Parse_state {
 class Var {
 	private:
 		int type = NONE;
+		std::string name;
 		std::string value = "";
 
 	public:
-		Var(int t, std::string v){type=t; value=v;}
+		Var(int t, std::string n){type=t; name=n;}
 		void Settype(int t){type = t;}
 		void Setvalue(std::string v){value = v;}
+		void Setname(std::string v){name = v;}
+		int Gettype(){return type;}
 		std::string Getvalue(){return value;}
+		std::string Getname(){return name;}
 };
 
 Parse_state state;
@@ -118,6 +122,15 @@ void Statement(){
 	return;
 }
 
+void PrintVars(){
+
+	std::cout <<"\n--------------------------------------------"<<std::endl;
+	std::cout<<"Variables"<<std::endl;
+	for (auto i:variables)
+		std::cout<<i.Getname() << " = "<<  i.Getvalue()<<" " << Symbols[i.Gettype()]<<std::endl;
+
+}
+
 void Parse(std::vector<Token>&tokens){
 	state.tokens = tokens;
 
@@ -130,4 +143,5 @@ void Parse(std::vector<Token>&tokens){
 		if(state.line == "")return;
 		std::cout<<state.line<<std::endl;
 	}
+	PrintVars();
 }
