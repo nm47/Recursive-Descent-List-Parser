@@ -67,8 +67,6 @@ void Factor(){
 		std::string value = state.tokens[state.current_token].Getvalue();
 		t.Setvalue(value);
 		variables.back() = t;
-		//std::cout<<"New Variable with value "<<state.tokens[state.current_token].Getvalue()<<std::endl;
-		//this is definitely bad code, could be better but left for the sake of time.
 		Accept(STRING);
 		return;
 	}
@@ -134,14 +132,14 @@ void PrintVars(){
 void Parse(std::vector<Token>&tokens){
 	state.tokens = tokens;
 
-	for (auto i:tokens)
-		std::cout<<i.Getvalue()<<" " << Symbols[i.Gettype()]<<std::endl;
-	std::cout <<"\n--------------------------------------------"<<std::endl;
+	//for (auto i:tokens)
+		//std::cout<<i.Getvalue()<<" " << Symbols[i.Gettype()]<<std::endl;
+	//std::cout <<"\n--------------------------------------------"<<std::endl;
 	while (state.current_token < state.tokens.size()){
 		state.line = "";
 		Statement();
-		if(state.line == "")return;
-		std::cout<<state.line<<std::endl;
+		if(state.line == "")break;
+		//std::cout<<state.line<<std::endl;
 	}
 	PrintVars();
 }
