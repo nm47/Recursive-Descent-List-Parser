@@ -47,31 +47,43 @@ int Accept(int type, bool peek = false){
 
 void Expect(int type){
 	if(!Accept(type)){
-		std::cout<<"Parsing Error"<<std::endl;
+		std::cout<<"Parsing Error: ";
 		std::cout<<"Expected " <<Symbols[type]<<" Got: "<<Symbols[state.tokens[state.current_token].Gettype()]<<std::endl;
+		std::cout<<state.line<<std::endl;
 	}
 }
 
 void List(){
-	Expression();
+	//Expression();
 	Expect(CBRACKET);
 }
 
 void Factor(){
 	Var t = variables.back();
-	if(Accept(NUMBER))
-		return;
-	if(Accept(IDENT))return;
-	if(Accept(STRING,true)){
-		variables.back().Settype(STRING);
+	if(Accept(NUMBER, true)){
 		std::string value = state.tokens[state.current_token].Getvalue();
 		t.Setvalue(value);
+		t.Settype(NUMBER);
+		variables.back() = t;
+		Accept(NUMBER);
+		return;
+	}
+	if(Accept(IDENT)){std::cout<<"IDENT"<<std::endl;return;}
+	if(Accept(STRING,true)){
+		std::string value = state.tokens[state.current_token].Getvalue();
+		t.Setvalue(value);
+		t.Settype(STRING);
 		variables.back() = t;
 		Accept(STRING);
 		return;
 	}
-	if(Accept(OBRACKET))
+	if(Accept(OBRACKET)){
+		variables.back().Settype(LIST);
+		t.Setvalue("[]");
+		t.Settype(LIST);
+		variables.back() = t;
 		List();
+	}
 }
 
 void Term(){
@@ -96,7 +108,7 @@ void Assignment(){
 void Ident(){
 	Token t = state.tokens[state.current_token];
 	Var v = Var(t.Gettype(), t.Getvalue()); 
-	variables.push_back(v);			//push the IDENT into variables, we'll assign the type when we know what it is.
+	variables.push_back(v);
 	
 	Accept(IDENT);
 	if(Accept(EQUALS))
