@@ -1,4 +1,4 @@
 a="Hello"
 b="World"
-l1=a+b
-print(l1)
+d=1+2
+l1=["Hello World"]
