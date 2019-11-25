@@ -36,7 +36,6 @@ int Accept(int type, bool peek = false){
 		state.current_token++;
 	}	
 	if(state.tokens[state.current_token].Gettype()==type){
-		if(state.tokens[state.current_token].Gettype()==CBRACKET)std::cout<<"Accept CBRACKET"<<std::endl;
 		if(!peek){
 			state.line+=state.tokens[state.current_token].Getvalue();
 			state.current_token++;
@@ -94,6 +93,9 @@ void Factor(char op = ' '){
 	if(Accept(STRING,true)){
 		std::string value = state.tokens[state.current_token].Getvalue();
 		t.Setvalue(value);
+		if(op=='+')
+			value=value+variables.back().Getvalue();
+		//if(op=='-')//ERROR
 		t.Settype(STRING);
 		variables.back() = t;
 		Accept(STRING);
@@ -167,8 +169,8 @@ void PrintVars(){
 void Parse(std::vector<Token>&tokens){
 	state.tokens = tokens;
 
-	//for (auto i:tokens)
-	//	std::cout<<i.Getvalue()<<" " << Symbols[i.Gettype()]<<std::endl;
+	for (auto i:tokens)
+		std::cout<<i.Getvalue()<<" " << Symbols[i.Gettype()]<<std::endl;
 	std::cout <<"\n--------------------------------------------"<<std::endl;
 	while (state.current_token < state.tokens.size()){
 		state.line = "";
