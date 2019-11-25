@@ -36,6 +36,7 @@ int Accept(int type, bool peek = false){
 		state.current_token++;
 	}	
 	if(state.tokens[state.current_token].Gettype()==type){
+		if(state.tokens[state.current_token].Gettype()==CBRACKET)std::cout<<"Accept CBRACKET"<<std::endl;
 		if(!peek){
 			state.line+=state.tokens[state.current_token].Getvalue();
 			state.current_token++;
@@ -53,12 +54,25 @@ void Expect(int type){
 	}
 }
 
-void List(){
-	Expression(); //Expressions Automatically change the last variables type and value, which breaks this.
-	while(Accept(COMMA))
-		//New index of list, list class with vector base
+void ListExpression(){
+	std::cout<<state.line<<std::endl;
+	Expression();
+	std::cout<<"Expression Terminated"<<std::endl;
+	std::cout<<state.line<<std::endl;
+	while(Accept(COMMA)){
 		Expression();
+		//Add value to list vector
+	}
 	Expect(CBRACKET);
+}
+
+void List(){
+	ListExpression();
+	while(Accept(PLUS)){
+		Expect(OBRACKET);
+		ListExpression();
+	}
+	Accept(CBRACKET);
 }
 
 void Factor(char op = ' '){
@@ -67,6 +81,9 @@ void Factor(char op = ' '){
 		std::string value = state.tokens[state.current_token].Getvalue();
 		if(op =='+')
 			value=std::to_string(stoi(value)+stoi(variables.back().Getvalue()));
+		if(op =='-')
+			value=std::to_string(stoi(variables.back().Getvalue())-stoi(value));
+
 		t.Setvalue(value);
 		t.Settype(NUMBER);
 		variables.back() = t;
@@ -151,8 +168,8 @@ void Parse(std::vector<Token>&tokens){
 	state.tokens = tokens;
 
 	//for (auto i:tokens)
-		//std::cout<<i.Getvalue()<<" " << Symbols[i.Gettype()]<<std::endl;
-	//std::cout <<"\n--------------------------------------------"<<std::endl;
+	//	std::cout<<i.Getvalue()<<" " << Symbols[i.Gettype()]<<std::endl;
+	std::cout <<"\n--------------------------------------------"<<std::endl;
 	while (state.current_token < state.tokens.size()){
 		state.line = "";
 		Statement();
