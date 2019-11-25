@@ -54,14 +54,19 @@ void Expect(int type){
 }
 
 void List(){
-	//Expression();
+	Expression(); //Expressions Automatically change the last variables type and value, which breaks this.
+	while(Accept(COMMA))
+		//New index of list, list class with vector base
+		Expression();
 	Expect(CBRACKET);
 }
 
-void Factor(){
+void Factor(char op = ' '){
 	Var t = variables.back();
 	if(Accept(NUMBER, true)){
 		std::string value = state.tokens[state.current_token].Getvalue();
+		if(op =='+')
+			value=std::to_string(stoi(value)+stoi(variables.back().Getvalue()));
 		t.Setvalue(value);
 		t.Settype(NUMBER);
 		variables.back() = t;
@@ -86,8 +91,8 @@ void Factor(){
 	}
 }
 
-void Term(){
-	Factor();
+void Term(char op = ' '){
+	Factor(op);
 	while(Accept(MULT)||Accept(DIV))
 		Factor();
 }
@@ -96,7 +101,8 @@ void Expression(){
 	Accept(LPAREN);
 	Term();
 	while(Accept(PLUS)||Accept(MINUS)){
-		Term();
+		char op = state.line.back();
+		Term(op);
 	}
 	Accept(RPAREN);
 }
