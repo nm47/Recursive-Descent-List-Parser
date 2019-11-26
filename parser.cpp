@@ -54,10 +54,7 @@ void Expect(int type){
 }
 
 void ListExpression(){
-	std::cout<<state.line<<std::endl;
 	Expression();
-	std::cout<<"Expression Terminated"<<std::endl;
-	std::cout<<state.line<<std::endl;
 	while(Accept(COMMA)){
 		Expression();
 		//Add value to list vector
@@ -74,22 +71,50 @@ void List(){
 	Accept(CBRACKET);
 }
 
+int Getvar(std::string name){
+	if(variables.size()==0)return -1;
+	for(Var v : variables){
+		int x=0;
+		if(v.Getname() == name && v.Gettype()!=IDENT){
+			return x;
+		}
+		x++;
+	}
+	return -1;
+}
+
 void Factor(char op = ' '){
 	Var t = variables.back();
+	int index;
+	if(Getvar(t.Getvalue())==-1)
+		index = variables.size()-1;
+	else
+		index = Getvar(t.Getvalue());
+
 	if(Accept(NUMBER, true)){
 		std::string value = state.tokens[state.current_token].Getvalue();
-		if(op =='+')
-			value=std::to_string(stoi(value)+stoi(variables.back().Getvalue()));
-		if(op =='-')
-			value=std::to_string(stoi(variables.back().Getvalue())-stoi(value));
+		if(op =='+'){
+			value=std::to_string(stoi(value)+stoi(variables[index].Getvalue()));
+		}
+		if(op =='-'){
+			value=std::to_string(stoi(variables[index].Getvalue())-stoi(value));
+		}
 
 		t.Setvalue(value);
 		t.Settype(NUMBER);
-		variables.back() = t;
+		variables[index] = t;
 		Accept(NUMBER);
 		return;
 	}
-	if(Accept(IDENT)){std::cout<<"IDENT"<<std::endl;return;}
+	if(Accept(IDENT,true)){
+		int varindex;
+		if((varindex=Getvar(state.tokens[state.current_token].Getvalue()))==-1)
+			std::cout<<"Var is undefined"<<std::endl;
+		t.Setvalue((variables[varindex].Getvalue()));
+		t.Settype(variables[varindex].Gettype());
+		variables[index] = t;
+		Accept(IDENT);
+	}
 	if(Accept(STRING,true)){
 		std::string value = state.tokens[state.current_token].Getvalue();
 		t.Setvalue(value);
@@ -169,9 +194,9 @@ void PrintVars(){
 void Parse(std::vector<Token>&tokens){
 	state.tokens = tokens;
 
-	for (auto i:tokens)
-		std::cout<<i.Getvalue()<<" " << Symbols[i.Gettype()]<<std::endl;
-	std::cout <<"\n--------------------------------------------"<<std::endl;
+	//for (auto i:tokens)
+		//std::cout<<i.Getvalue()<<" " << Symbols[i.Gettype()]<<std::endl;
+	//std::cout <<"\n--------------------------------------------"<<std::endl;
 	while (state.current_token < state.tokens.size()){
 		state.line = "";
 		Statement();
