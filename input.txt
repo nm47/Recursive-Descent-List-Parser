@@ -1,4 +1,3 @@
-a="Hello"
-b="World"
-d=1+2
-l1=["Hello World"]
+y="Hello World"
+a=1
+x=a+1

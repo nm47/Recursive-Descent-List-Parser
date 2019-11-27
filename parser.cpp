@@ -97,7 +97,6 @@ void Factor(char op = ' '){
 	if(Accept(NUMBER, true)){
 		std::string value = state.tokens[state.current_token].Getvalue();
 		if(op =='+'){
-			stoi(variables[index].Getvalue());
 			value=std::to_string(stoi(value)+stoi(variables[index].Getvalue()));
 		}
 		if(op =='-'){
@@ -114,7 +113,15 @@ void Factor(char op = ' '){
 		int varindex;
 		if((varindex=Getvar(state.tokens[state.current_token].Getvalue()))==-1)
 			std::cout<<"#ERROR Var is undefined"<<std::endl;
-		t.Setvalue((variables[varindex].Getvalue()));
+
+		std::string value = variables[varindex].Getvalue();
+		if(op =='+'){
+			value=std::to_string(stoi(value)+stoi(variables[index].Getvalue()));
+		}
+		if(op =='-'){
+			value=std::to_string(stoi(variables[index].Getvalue())-stoi(value));
+		}
+		t.Setvalue(value);
 		t.Settype(variables[varindex].Gettype());
 		variables[index] = t;
 		Accept(IDENT);
