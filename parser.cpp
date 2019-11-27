@@ -29,6 +29,7 @@ Parse_state state;
 std::vector<Var>variables;
 
 void Expression();
+void PrintVars();
 
 int Accept(int type, bool peek = false){
 	while(state.tokens[state.current_token].Gettype()==SPACE){
@@ -73,8 +74,8 @@ void List(){
 
 int Getvar(std::string name){
 	if(variables.size()==0)return -1;
+	int x=0;
 	for(Var v : variables){
-		int x=0;
 		if(v.Getname() == name && v.Gettype()!=IDENT){
 			return x;
 		}
@@ -86,14 +87,17 @@ int Getvar(std::string name){
 void Factor(char op = ' '){
 	Var t = variables.back();
 	int index;
-	if(Getvar(t.Getvalue())==-1)
+	if(Getvar(t.Getname())==-1){
 		index = variables.size()-1;
-	else
-		index = Getvar(t.Getvalue());
+	}
+	else{
+		index = Getvar(t.Getname());
+	}
 
 	if(Accept(NUMBER, true)){
 		std::string value = state.tokens[state.current_token].Getvalue();
 		if(op =='+'){
+			stoi(variables[index].Getvalue());
 			value=std::to_string(stoi(value)+stoi(variables[index].Getvalue()));
 		}
 		if(op =='-'){
@@ -109,7 +113,7 @@ void Factor(char op = ' '){
 	if(Accept(IDENT,true)){
 		int varindex;
 		if((varindex=Getvar(state.tokens[state.current_token].Getvalue()))==-1)
-			std::cout<<"Var is undefined"<<std::endl;
+			std::cout<<"#ERROR Var is undefined"<<std::endl;
 		t.Setvalue((variables[varindex].Getvalue()));
 		t.Settype(variables[varindex].Gettype());
 		variables[index] = t;
