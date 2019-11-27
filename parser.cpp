@@ -25,6 +25,20 @@ class Var {
 		std::string Getname(){return name;}
 };
 
+class List {
+	private:
+		int type = NONE;
+		std::string name;
+		std::vector <Token> elements;
+
+	public:
+		
+		List(int t, std::string n){type=t; name=n;}
+		void Settype(int t){type = t;}
+		void Setname(std::string v){name = v;}
+		int Gettype(){return type;}
+};
+
 Parse_state state;
 std::vector<Var>variables;
 
@@ -84,6 +98,14 @@ int Getvar(std::string name){
 	return -1;
 }
 
+void PrintLine(int error){
+	if(error == 0)std::cout<<"#Error"<<std::endl;
+	while(!Accept(ENDLINE,true)){
+		state.current_token++;
+		state.line+=state.tokens[state.current_token].Getvalue();
+	}
+}
+
 void Factor(char op = ' '){
 	Var t = variables.back();
 	int index;
@@ -112,14 +134,29 @@ void Factor(char op = ' '){
 	if(Accept(IDENT,true)){
 		int varindex;
 		if((varindex=Getvar(state.tokens[state.current_token].Getvalue()))==-1)
-			std::cout<<"#ERROR Var is undefined"<<std::endl;
+			PrintLine(0);
 
 		std::string value = variables[varindex].Getvalue();
-		if(op =='+'){
-			value=std::to_string(stoi(value)+stoi(variables[index].Getvalue()));
-		}
-		if(op =='-'){
-			value=std::to_string(stoi(variables[index].Getvalue())-stoi(value));
+		if(variables[index].Gettype()==NUMBER){
+			if(op =='+'){
+				value=std::to_string(stoi(value)+stoi(variables[index].Getvalue()));
+			}
+			if(op =='-'){
+				value=std::to_string(stoi(variables[index].Getvalue())-stoi(value));
+			}
+		}else if(variables[index].Gettype()==STRING){
+			if(op =='+'){
+				if(variables[varindex].Gettype()==STRING){
+					std::string value2=variables[index].Getvalue();
+					value2.pop_back();
+					value.replace(0,1,"");
+					value=value2+value;
+				}
+				else {
+					PrintLine(0);
+					return;
+				}
+			}
 		}
 		t.Setvalue(value);
 		t.Settype(variables[varindex].Gettype());
