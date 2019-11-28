@@ -14,6 +14,7 @@ class Var {
 		int type = NONE;
 		std::string name;
 		std::string value = "";
+		std::vector<Token>elements;
 
 	public:
 		Var(int t, std::string n){type=t; name=n;}
@@ -23,20 +24,12 @@ class Var {
 		int Gettype(){return type;}
 		std::string Getvalue(){return value;}
 		std::string Getname(){return name;}
-};
-
-class List {
-	private:
-		int type = NONE;
-		std::string name;
-		std::vector <Token> elements;
-
-	public:
-		
-		List(int t, std::string n){type=t; name=n;}
-		void Settype(int t){type = t;}
-		void Setname(std::string v){name = v;}
-		int Gettype(){return type;}
+		Token Getelement(int e){return elements[e];}
+		void append(Token t){elements.push_back(t);}
+		void printelements(){
+			for (Token t : elements)
+				std::cout<<t.Getvalue()<<std::endl;
+		}
 };
 
 Parse_state state;
@@ -72,17 +65,12 @@ void ListExpression(){
 	Expression();
 	while(Accept(COMMA)){
 		Expression();
-		//Add value to list vector
 	}
 	Expect(CBRACKET);
 }
 
 void List(){
 	ListExpression();
-	while(Accept(PLUS)){
-		Expect(OBRACKET);
-		ListExpression();
-	}
 	Accept(CBRACKET);
 }
 
@@ -107,16 +95,18 @@ void PrintLine(int error){
 }
 
 void Factor(char op = ' '){
-	Var t = variables.back();
 	int index;
+	Var t = variables.back();
 	if(Getvar(t.Getname())==-1){
 		index = variables.size()-1;
 	}
 	else{
 		index = Getvar(t.Getname());
+		Var t = variables[index];
 	}
 
 	if(Accept(NUMBER, true)){
+		std::cout<<"Numbers yo"<<std::endl;
 		std::string value = state.tokens[state.current_token].Getvalue();
 		if(op =='+'){
 			value=std::to_string(stoi(value)+stoi(variables[index].Getvalue()));
@@ -125,11 +115,16 @@ void Factor(char op = ' '){
 			value=std::to_string(stoi(variables[index].Getvalue())-stoi(value));
 		}
 
-		t.Setvalue(value);
-		t.Settype(NUMBER);
-		variables[index] = t;
-		Accept(NUMBER);
-		return;
+		if(t.Gettype()!=LIST){
+			t.Setvalue(value);
+			t.Settype(NUMBER);
+			variables[index] = t;
+		}else{
+			t.append(state.tokens[state.current_token]);
+			t.printelements();
+		}
+			Accept(NUMBER);
+			return;
 	}
 	if(Accept(IDENT,true)){
 		int varindex;
@@ -157,6 +152,9 @@ void Factor(char op = ' '){
 					return;
 				}
 			}
+		}else if(variables[index].Gettype()==LIST){
+			std::cout<<"Fuck me man"<<std::endl;
+			//add to list
 		}
 		t.Setvalue(value);
 		t.Settype(variables[varindex].Gettype());
@@ -175,10 +173,10 @@ void Factor(char op = ' '){
 		return;
 	}
 	if(Accept(OBRACKET)){
-		variables.back().Settype(LIST);
-		t.Setvalue("[]");
 		t.Settype(LIST);
-		variables.back() = t;
+		t.Setvalue("");
+		t.Settype(LIST);
+		variables[index] = t;
 		List();
 	}
 }
@@ -231,7 +229,6 @@ void Statement(){
 }
 
 void PrintVars(){
-
 	std::cout <<"\n--------------------------------------------"<<std::endl;
 	std::cout<<"Variables"<<std::endl;
 	for (auto i:variables)
