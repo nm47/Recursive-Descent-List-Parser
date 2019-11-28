@@ -25,7 +25,11 @@ class Var {
 		std::string Getvalue(){return value;}
 		std::string Getname(){return name;}
 		Token Getelement(int e){return elements[e];}
+
+
 		void append(Token t){elements.push_back(t);}
+		void setelements(std::vector<Token>e){elements = e;}
+		std::vector<Token> getelements(){return elements;}
 		void printelements(){
 			for (Token t : elements)
 				std::cout<<t.Getvalue()<<std::endl;
@@ -106,7 +110,6 @@ void Factor(char op = ' '){
 	}
 
 	if(Accept(NUMBER, true)){
-		std::cout<<"Numbers yo"<<std::endl;
 		std::string value = state.tokens[state.current_token].Getvalue();
 		if(op =='+'){
 			value=std::to_string(stoi(value)+stoi(variables[index].Getvalue()));
@@ -121,7 +124,6 @@ void Factor(char op = ' '){
 			variables[index] = t;
 		}else{
 			t.append(state.tokens[state.current_token]);
-			t.printelements();
 		}
 			Accept(NUMBER);
 			return;
@@ -153,8 +155,15 @@ void Factor(char op = ' '){
 				}
 			}
 		}else if(variables[index].Gettype()==LIST){
-			//add to list
+			std::vector<Token> original = variables[varindex].getelements();
+			variables[index].printelements();
+			for (Token t:original)std::cout<<t.Getvalue();
+			std::vector<Token> added = variables[varindex].getelements();
+			original.insert(original.end(), added.begin(), added.end());
+			variables[index].setelements(original);
+			variables[index].printelements();
 		}
+
 		t.Setvalue(value);
 		t.Settype(variables[varindex].Gettype());
 		variables[index] = t;
