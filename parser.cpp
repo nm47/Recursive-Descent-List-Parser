@@ -31,8 +31,15 @@ class Var {
 		void setelements(std::vector<Token>e){elements = e;}
 		std::vector<Token> getelements(){return elements;}
 		void printelements(){
-			for (Token t : elements)
-				std::cout<<t.Getvalue()<<std::endl;
+			std::cout<<"[";
+			int x=0;
+			for (Token t : elements){
+				std::cout<<t.Getvalue();
+				if(x < elements.size()-1)
+					std::cout<<",";
+				x++;
+			}
+			std::cout<<"]"<<std::endl;
 		}
 };
 
@@ -158,12 +165,9 @@ void Factor(char op = ' '){
 		}else if(variables[index].Gettype()==LIST){
 			PrintVars();
 			std::vector<Token> original = variables[varindex].getelements();
-			variables[index].printelements();
-			for (Token t:original)std::cout<<t.Getvalue();
 			std::vector<Token> added = variables[varindex].getelements();
 			original.insert(original.end(), added.begin(), added.end());
 			variables[index].setelements(original);
-			variables[index].printelements();
 		}
 
 		t.Setvalue(value);
@@ -223,7 +227,17 @@ void Ident(){
 
 void Print(){
 	Accept(LPAREN);
-	Expression();
+	if(Accept(IDENT,true)){
+		int i = Getvar(state.tokens[state.current_token].Getvalue());
+		if(i !=-1){
+			Var v = variables[i];
+			if(v.Gettype()==LIST){
+				std::cout<<"LIST"<<std::endl;
+			}
+			else std::cout<<v.Getvalue()<<std::endl;
+			Accept(IDENT);
+		}
+	}
 	Accept(RPAREN);
 }
 
