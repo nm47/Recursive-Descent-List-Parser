@@ -124,6 +124,7 @@ void Factor(char op = ' '){
 			variables[index] = t;
 		}else{
 			t.append(state.tokens[state.current_token]);
+			variables[index]=t;
 		}
 			Accept(NUMBER);
 			return;
@@ -155,6 +156,7 @@ void Factor(char op = ' '){
 				}
 			}
 		}else if(variables[index].Gettype()==LIST){
+			PrintVars();
 			std::vector<Token> original = variables[varindex].getelements();
 			variables[index].printelements();
 			for (Token t:original)std::cout<<t.Getvalue();
