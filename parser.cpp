@@ -153,7 +153,6 @@ void Factor(char op = ' '){
 				}
 			}
 		}else if(variables[index].Gettype()==LIST){
-			std::cout<<"Fuck me man"<<std::endl;
 			//add to list
 		}
 		t.Setvalue(value);
