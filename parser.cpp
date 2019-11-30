@@ -28,7 +28,9 @@ class Var {
 
 
 		void append(Token t){elements.push_back(t);}
-		void setelements(std::vector<Token>e){elements = e;}
+		void setelements(std::vector<Token>e){
+			elements = e;
+		}
 		std::vector<Token> getelements(){return elements;}
 		void printelements(){
 			std::cout<<"[";
@@ -162,27 +164,34 @@ void Factor(char op = ' '){
 					return;
 				}
 			}
-		}else if(variables[index].Gettype()==LIST){
-			PrintVars();
-			std::vector<Token> original = variables[varindex].getelements();
+		}else if(variables[varindex].Gettype()==LIST){
+			Var v = variables[index];
+			std::vector<Token> original = variables[index].getelements();
 			std::vector<Token> added = variables[varindex].getelements();
 			original.insert(original.end(), added.begin(), added.end());
-			variables[index].setelements(original);
+			v.setelements(original);
+			v.Settype(LIST);
+			variables[index]=v;
 		}
-
-		t.Setvalue(value);
-		t.Settype(variables[varindex].Gettype());
-		variables[index] = t;
+		//std::cout<<Symbols[state.tokens[state.current_token].Gettype()];
+		////t.Setvalue(value);
+		//t.Settype(variables[varindex].Gettype());
+		//variables[index] = t;
 		Accept(IDENT);
 	}
 	if(Accept(STRING,true)){
 		std::string value = state.tokens[state.current_token].Getvalue();
-		t.Setvalue(value);
 		if(op=='+')
-			value=value+variables.back().Getvalue();
-		//if(op=='-')//ERROR
-		t.Settype(STRING);
-		variables.back() = t;
+			value=value+variables[index].Getvalue();//CHANGED
+
+		if(t.Gettype()!=LIST){
+			t.Setvalue(value);
+			t.Settype(STRING);
+			variables[index] = t;
+		}else{
+			t.append(state.tokens[state.current_token]);
+			variables[index]=t;
+		}
 		Accept(STRING);
 		return;
 	}
@@ -232,7 +241,7 @@ void Print(){
 		if(i !=-1){
 			Var v = variables[i];
 			if(v.Gettype()==LIST){
-				std::cout<<"LIST"<<std::endl;
+				v.printelements();
 			}
 			else std::cout<<v.Getvalue()<<std::endl;
 			Accept(IDENT);
